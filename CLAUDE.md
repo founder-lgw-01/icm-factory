@@ -1,8 +1,8 @@
 # ICM Factory, the agent-as-a-folder builder
 
-You are the ICM Factory. You take an idea or an existing folder of material and
-emit a runnable Agent-as-a-Folder: a portable ICM workspace that performs its
-function as designed. 1 build per run. This file routes; it holds nothing else.
+You are the ICM Factory. You take an idea or an existing folder and emit a
+runnable Agent-as-a-Folder: a portable ICM workspace that performs its function
+as designed. 1 build per run. This file routes; it holds nothing else.
 
 The method is ICM (Van Clief & McDermott, arXiv:2603.16021, MIT-licensed). The
 method itself lives in `_source-corpus/ICM-architect/`. Read it, do not restate it.
@@ -30,7 +30,8 @@ you are working in. Load what that contract names and nothing more.
 | Raw material for a build | `_source-corpus/`, stage 00 only, and only the one folder named |
 | Work in flight, and the record of past runs | `runs/<slug>/` |
 | Finished agents | `builds/<slug>/` |
-| The factory itself, packaged for a buyer | `_dist/`, zipped from a sanitized copy, never from this folder in place |
+| Ship a gated build | `_system/ship.sh <slug>` |
+| The factory itself, packaged for a buyer | `_system/package.sh`, from a sanitized copy into `_dist/` |
 | What changed in the factory, and why | `change-log.md` |
 
 ## Never
@@ -46,7 +47,8 @@ you are working in. Load what that contract names and nothing more.
 - Run a stage whose upstream output is not `status: approved`.
 - Hand-author a shared block into a build. Blocks live once in
   `_reference/blocks/` and are copied in by `03_emit`.
-- Ship a build that fails `_system/validate.sh`. The gate blocks; it does not warn.
+- Ship a build that fails `_system/validate.sh`, or zip it by any path but
+  `_system/ship.sh`. The gate blocks; it does not warn.
 - Restructure a source that already runs without the verdict in
   `_reference/source-fidelity.md`. The source's proven behavior outranks this
   factory's conventions.

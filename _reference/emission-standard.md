@@ -7,7 +7,9 @@ meet this, it does not ship.
 ## Portable, absolutely
 
 A built agent runs with no parent and no sibling. Zip `builds/<slug>/`, hand it to
-someone who has never heard of this factory, and it works.
+someone who has never heard of this factory, and it works. The zip is cut by
+`_system/ship.sh`, which re-runs the gate first and verifies the zip against the
+tree; every gated build ships as `_dist/<slug>-<date>.zip`.
 
 That means, with no exceptions:
 
@@ -22,11 +24,28 @@ That means, with no exceptions:
 | File | Holds | Budget |
 |---|---|---|
 | `CLAUDE.md` | identity in 2 lines, "where am I", a routing table, `## Never` | < 800 tokens, < 60 lines |
+| `AGENTS.md` | `CLAUDE.md`, byte for byte; written by `03_emit`, never by hand | same as `CLAUDE.md` |
 | `CONTEXT.md` | the whole line as 1 table; factory/product split; status; naming | < 800 tokens |
 | `README.md` | what this agent does, how to start a run, the ICM credit | no budget |
 | `<NN_stage>/CONTEXT.md` | 1 per stage, the contract | < 650 tokens each |
 | `_reference/` | the stable rules this agent obeys | - |
 | `_templates/` | blank starters, if the agent instantiates anything | - |
+
+## 2 entry files, 1 home
+
+Hosts differ on which file they load first. Claude Code reads `CLAUDE.md`.
+Hermes reads project context first match wins, `.hermes.md` → `AGENTS.md` →
+`CLAUDE.md`, and loads the winner as literal instruction text: a line inside it
+saying "read `CLAUDE.md`" is not followed as context loading, only as a
+suggestion the model may act on with a tool. Codex and other `AGENTS.md`
+readers behave the same way. Confirmed on 2026-09-25 from Hermes's own
+`agent/prompt_builder.py`.
+
+So every build ships both. `CLAUDE.md` is the 1 home: the scaffold writes it,
+the budgets and routing checks read it. `03_emit` copies it to `AGENTS.md`
+after the blocks are resolved, and the gate's `entry` check fails a build
+where the 2 differ, which is what a hand edit to either looks like. A build
+never ships `.hermes.md`, because it would outrank both.
 
 ## Every stage contract has, in this order
 

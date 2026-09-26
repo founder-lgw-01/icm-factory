@@ -10,3 +10,5 @@ every-build: yes
   references, and its inputs. Nothing more.
 - Edit a generated file by hand. Run the thing that generates it.
 - Invent a number, a date, or a quote. Count it, cite it, or mark it unknown.
+- Edit `AGENTS.md` by hand. It is a copy of `CLAUDE.md` for hosts that read
+  `AGENTS.md` first; change `CLAUDE.md`, then copy it over `AGENTS.md` again.

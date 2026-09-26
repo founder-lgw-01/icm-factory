@@ -13,6 +13,9 @@ This file does not ship: `03_emit` strips it.
 | `NN_stage/CONTEXT.md` | copy once per stage, rename `NN_stage` to the real name |
 | `_reference/voice.md` | the agent's own voice rules, or delete if intake heard none |
 
+`AGENTS.md` is not here on purpose. `03_emit` makes it as a byte-for-byte copy
+of the finished `CLAUDE.md`, for hosts that read `AGENTS.md` first.
+
 The built agent writes every run's output into `runs/<unit>/`, numbered by the
 stage that wrote it. Stage folders hold contracts only. Routing rows name that
 folder with its placeholder, `runs/<unit>/`, because it exists only once a run

@@ -46,4 +46,5 @@ build.
 If blocked, read the failing lines and confirm the named fix is a factory fix, not
 a build patch. If passing, do the cold walk yourself on 1 stage you did not
 write: you are checking the walk, not the script. Then flip `status: approved`.
-The build ships when this line reads approved and not before.
+The build ships when this line reads approved and not before: run
+`../../_system/ship.sh <slug>`, which re-gates and zips it into `_dist/`.

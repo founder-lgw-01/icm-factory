@@ -10,11 +10,13 @@
 # The checks, one labelled section each. This header is the list, and nothing
 # else in the factory enumerates them.
 #   structure   the required files and folders exist
+#   entry       AGENTS.md exists and is CLAUDE.md byte for byte, for hosts that read AGENTS.md
 #   isolation   no path climbs out of the build, no name for the factory, no absolute path
 #   budget      the entry file, root CONTEXT.md and every contract fit their token limits
 #   routing     every path a routing file or a contract names resolves inside the build
 #   contracts   every stage contract carries its sections and exactly 1 human check
 #   residue     nothing from the factory or the skeleton is left in the build
+#   empty       no empty folder; a zip drops it, so the build unpacked is not the build gated
 #   hygiene     the factory's own stages/ holds contracts only (a factory fault, not the build's)
 #   chain       the run behind the build is status: approved at every stage
 #   blocks      every block the emit log names matches its single home, verbatim
@@ -63,6 +65,19 @@ for s in $stages; do
 done
 [ -n "$stages" ] || bad "structure: no NN_ stage folder; a build without a line gives the gate nothing to check"
 [ "$fail" -eq 0 ] && good "structure: required files present"
+
+# ---------- entry ----------
+# Hosts differ on the entry file. Claude Code reads CLAUDE.md. Hermes and Codex
+# read AGENTS.md first and load it as literal text; a pointer inside it is not
+# followed. So 03_emit copies CLAUDE.md to AGENTS.md and the build ships both,
+# with CLAUDE.md the 1 home. A hand edit to either shows up here as a difference.
+en=0
+if [ ! -f "$BUILD/AGENTS.md" ]; then
+  bad "entry: missing AGENTS.md, the copy of CLAUDE.md that AGENTS.md hosts read"; en=1
+elif [ -f "$BUILD/CLAUDE.md" ] && ! cmp -s "$BUILD/CLAUDE.md" "$BUILD/AGENTS.md"; then
+  bad "entry: AGENTS.md differs from CLAUDE.md; re-emit, never hand-edit either"; en=1
+fi
+[ "$en" -eq 0 ] && good "entry: AGENTS.md is CLAUDE.md byte for byte"
 
 # ---------- isolation ----------
 iso=0
@@ -170,6 +185,15 @@ hits=$(grep -rnE '^stage: 0[0-4]_(intake|form|scaffold|emit|validate)' "$BUILD" 
 stray=$(find "$BUILD" -maxdepth 1 \( -iname 'manifest.md' -o -iname 'skeleton.md' \) 2>/dev/null)
 [ -n "$stray" ] && { bad "residue: scaffold file shipped in the build"; echo "$stray"; rs=1; }
 [ "$rs" -eq 0 ] && good "residue: nothing from the factory left behind"
+
+# ---------- empty ----------
+# An empty folder is always a scaffold leftover, and a zip drops it, so a build
+# that passes with one is not the build a recipient unpacks. Found by the cold
+# walk on characterworldengine, 2026-09-25.
+ef=0
+hits=$(find "$BUILD" -mindepth 1 -type d -empty 2>/dev/null | head -5)
+[ -n "$hits" ] && { bad "empty: folder with nothing in it; remove it from the scaffold and re-emit"; echo "$hits"; ef=1; }
+[ "$ef" -eq 0 ] && good "empty: no empty folder"
 
 # ---------- factory hygiene ----------
 # Not about this build: stages/ holds contracts only, and no run may leave

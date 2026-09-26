@@ -37,6 +37,7 @@ fresh() {
     printf '# Fixture agent\n\nRoutes only.\n\n| Task | Go to |\n|---|---|\n| Start a run | `CONTEXT.md` |\n| The step | `01_step/CONTEXT.md` |\n| Rules | `_reference/` |\n\n## Never\n\n'
     body never-stem; echo "- Edit a generated file."
   } > "$B/CLAUDE.md"
+  cp "$B/CLAUDE.md" "$B/AGENTS.md"
   {
     printf '# Fixture, the line\n\n| Stage | Job | Input | Output | Human check |\n|---|---|---|---|---|\n| `01_step` | do the thing | the brief | `runs/<unit>/01-out.md` | read the output against the brief |\n\n'
     body status-convention; echo; body edit-surface; echo; body naming
@@ -113,6 +114,9 @@ fresh; sed -i '/^check: none/d' "$R/02-scaffold/manifest.md";                   
 fresh; sed -i 's|^check: none|check: false {file} :: README.md|' "$R/02-scaffold/manifest.md";  expect FAIL "self-check that exits nonzero"
 fresh; sed -i 's|^check: none|check: test -f {file} :: nothing-*.md|' "$R/02-scaffold/manifest.md"; expect FAIL "self-check whose files match nothing"
 fresh; printf 'check: test -f {file} :: README.md\n' >> "$R/02-scaffold/manifest.md";           expect FAIL "check: none beside a real check"
+fresh; rm -f "$B/AGENTS.md";                                                                   expect FAIL "AGENTS.md missing"
+fresh; printf '\n- A line added by hand.\n' >> "$B/AGENTS.md";                                 expect FAIL "AGENTS.md hand-edited away from CLAUDE.md"
+fresh; mkdir -p "$B/01_step/references";                                                       expect FAIL "empty folder inside the build"
 
 # ---- must PASS: legitimate look-alikes ----
 fresh; mkdir -p "$B/skills/x"; printf 'const a = s.replace(/data:image/, "x");\n' > "$B/skills/x/tool.mjs";   expect PASS "JS regex literal in a code file"

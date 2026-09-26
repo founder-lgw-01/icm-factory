@@ -7,6 +7,8 @@ check on every stage contract.
 | Script | Run it | Blocks? |
 |---|---|---|
 | `validate.sh <slug>` | stage `04_validate`, on 1 build | yes, exit 1 |
+| `ship.sh <slug>` | after `04_validate` is approved; re-gates, then zips the build into `_dist/` | yes, exit 1 and no zip |
+| `package.sh` | to cut the factory itself for a buyer: sanitized copy, checked, zipped into `_dist/` | yes, exit 1 and no zip |
 | `audit-builds.sh` | after any change to a block, the standard, or a voice law | yes, exit 1 |
 | `voice-check.sh <path>` | called by `validate.sh`; also runnable alone | yes, exit 1 |
 | `test-gate.sh` | after any change to `validate.sh` or `voice-check.sh` | yes, exit 1 on a probe that lands wrong |

@@ -8,6 +8,142 @@ Newest first.
 
 ---
 
+## 2026-09-25, the factory package is cut by a script
+
+Owner's call: cut a new factory package, since the one in `_dist/` predated
+the day's changes, and archive the old one. The first package was cut by hand
+in 6 steps described in the 2026-09-07 entry. A second cut done by hand would
+match the first only by luck, so the steps are now `_system/package.sh`.
+
+What it does, in order: copies the root files, `stages/`, `_reference/`,
+`_templates/`, `_system/` and `_source-corpus/ICM-architect/` (no `.git/`) to
+a scratch folder; rewords the 14 provenance lines that name the owner's source
+kit, a run slug, a local path or the owner, as literal replacements that each
+must land or the cut is refused; replaces `change-log.md` with 1 release entry
+whose counts (stages, blocks, gate sections, probes) are read from the copy;
+runs `test-gate.sh`, `audit-builds.sh`, `voice-check.sh` and an em dash byte
+count on the files the factory writes; greps the whole copy for the owner's
+terms; zips it to `_dist/icm-factory-<date>[-vN].zip` rooted at
+`icm-factory/`; reads the zip back file by file. Any failure deletes the zip.
+
+3 things learned cutting it:
+- The vendored method, `ICM-architect/`, carries 120 em dashes and spelled-out
+  numbers, and the first package shipped it as written. The voice laws govern
+  what the factory writes, so the copy's voice and em dash checks skip
+  `_source-corpus/`, and the script header says why.
+- The script that removes the owner's words must contain them, twice: the
+  replacement table and the grep pattern. Both sit between marker comments,
+  and the copy's own `package.sh` gets both regions emptied, with a note for a
+  buyer to fill in their own. The owner grep would otherwise fail on itself.
+- The `## Pelto` heading in `prior-art.md` survived the first cut; it is now
+  reworded with the body.
+
+Changed: `_system/package.sh` (new); `CLAUDE.md` routes the buyer package row
+to it; `_system/CONTEXT.md` lists it. `_dist/icm-factory-2026-09-07-v2.zip`
+moved to `_dist/_archive/`. New package: `_dist/icm-factory-2026-09-25.zip`,
+51 files, 56 probes clean inside the copy.
+
+Builds affected: none.
+
+---
+
+## 2026-09-25, every gated build ships as a zip in `_dist/`
+
+Owner's call: builds are zipped for hand-over the same way the factory is,
+every one of them. `_dist/` had held the factory package only, cut by hand
+from a sanitized copy. A build needs no sanitizing, since the gate already
+proves nothing in it names the factory, but it does need a path from "gate
+report approved" to "a zip exists" that cannot be taken early or by hand.
+
+New `_system/ship.sh <slug>`. It refuses unless
+`runs/<slug>/04-gate-report.md` is `status: approved` with `verdict: pass` in
+its frontmatter, re-runs `validate.sh` because a block or rule may have moved
+since the report, and only then zips `builds/<slug>/` to
+`_dist/<slug>-<date>[-vN].zip`, entries rooted at `<slug>/`. The zip is read
+back and checked file by file against the tree; a mismatch deletes it. Python
+writes the zip; neither `zip` nor `7z` is on the machine. The first run picked
+`python3`, which on this Windows machine is a Store alias that prints an
+install hint and exits nonzero, so the script now tries each candidate with an
+import before trusting it, and says "python failed" rather than "zip did not
+match" when that is what happened. The `-vN` suffix matches the factory
+package's naming and never overwrites.
+
+`CLAUDE.md` went to 838t and 60 lines with the 2 additions and was trimmed to
+fit: the new Never line folded into the existing ship line, the routing rows
+shortened.
+
+Changed: `CLAUDE.md` gains a routing row and a `## Never` line (zip a build by
+any path but `ship.sh`); the `_dist/` row now names the factory package by its
+pattern. `_system/CONTEXT.md` lists the script. `stages/04_validate/CONTEXT.md`
+human check ends by naming the script. `emission-standard.md` says the zip is
+cut by `ship.sh`.
+
+Builds shipped: `characterworldengine`, first zip in `_dist/` for a build.
+
+The factory package in `_dist/` is from 2026-09-07 and predates today's 3
+changes (AGENTS.md, the `empty` check, `ship.sh`). Cutting a new one is a
+separate decision and was not done.
+
+---
+
+## 2026-09-25, the gate blocks an empty folder
+
+Found by the cold walk on `characterworldengine`, after the gate had passed
+all 12 checks. The build carried `00_setup/references/`, an empty folder left
+from the scaffold's first layout before the reference images moved to
+`world/references/`. Nothing pointed at it and no check looked for it. A zip
+drops an empty folder, so the build gated is not the build a recipient unpacks,
+and the emission standard says stage folders hold contracts only.
+
+Changed: `_system/validate.sh` gains section `empty`, after `residue`: any
+empty folder in the build blocks. Header updated. `_system/test-gate.sh` gains
+1 probe, 56 in all. The empty folder was removed from the approved scaffold;
+it was never in `manifest.md`, which lists files, and nothing else in the
+scaffold changed.
+
+Builds re-run: `characterworldengine`, through `03_emit`, from the same
+scaffold and the same approved emit log, whose file list is unchanged.
+
+---
+
+## 2026-09-25, every build ships `AGENTS.md`, a copy of `CLAUDE.md`
+
+Owner's call, on the first build for a host that is not Claude Code:
+`characterworldengine`, made for Hermes. The question was whether the factory
+should know that Hermes, Codex, and ChatGPT-style agents read `AGENTS.md`, or
+leave that to the operator. It should know: intake already records the host,
+the text is identical in every build, and a hand-added file inside `builds/` is
+deleted by the next re-emit with nothing to notice.
+
+A 3-line pointer (`AGENTS.md` saying "read `CLAUDE.md`") was proposed first
+and rejected on evidence. The owner checked Hermes's installed code,
+`agent/prompt_builder.py`: project context is loaded first match wins,
+`.hermes.md` → `AGENTS.md` → `CLAUDE.md`, as literal instruction text, and a
+pointer inside it is not followed as context loading. So `AGENTS.md` carries
+the full entry text, generated at emit, and `CLAUDE.md` stays the 1 home.
+
+Changed:
+- Block `never-stem` gains a line: never edit `AGENTS.md` by hand; change
+  `CLAUDE.md` and copy it again.
+- `emission-standard.md`: `AGENTS.md` in the required-files table, and a new
+  section, **2 entry files, 1 home**, holding the finding and the rule that a
+  build never ships `.hermes.md`.
+- `stages/03_emit/CONTEXT.md` step 8: copy `CLAUDE.md` to `AGENTS.md`, last.
+  The step pushed the contract to 696t; steps 2, 4, 6 and the Outputs line
+  were trimmed to point rather than restate, and it measures 637t of 650.
+- `_system/validate.sh`: new section `entry`, after `structure`: `AGENTS.md`
+  exists and is `CLAUDE.md` byte for byte. Header updated.
+- `_system/test-gate.sh`: the fixture ships `AGENTS.md`; 2 new probes,
+  missing and hand-edited. 55 probes in all.
+- `_templates/agent-skeleton/SKELETON.md` says why `AGENTS.md` is not in the
+  skeleton.
+
+Builds re-run: `characterworldengine`, through `03_emit`. The build had been
+emitted and not yet gated or approved, so it was removed and emitted again from
+the same approved scaffold. The scaffold did not change.
+
+---
+
 ## 2026-09-07, the shipped package carries a v2 suffix
 
 Owner's call. The buyer package is now
