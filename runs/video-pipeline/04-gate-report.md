@@ -2,7 +2,7 @@
 slug: video-pipeline
 stage: 04_validate
 status: approved
-generated: 2026-09-07
+generated: 2026-09-27
 verdict: pass
 sources:
   - builds/video-pipeline/
@@ -35,7 +35,20 @@ sentence and 2 words the kit calls jargon), and the kit's fragment check on a
 line the scaffold wrote. Each was fixed at its home, 4 blocks and 3 scaffold
 repairs, and the build re-emitted.
 
-## The checks
+## The fifth run, 2026-09-27
+
+The build had not been re-emitted since the 2 factory changes of 2026-09-25,
+and `audit-builds.sh` named it trailing on 2 sections: `entry`, no `AGENTS.md`,
+and `blocks`, the `never-stem` text in `CLAUDE.md` behind its single home.
+`03_emit` re-ran from the same approved scaffold. 2 files changed: `CLAUDE.md`
+gained the block's 2 new lines (55 lines of 60) and `AGENTS.md` is new. The
+gate then passed all 13 sections, the 11 below plus `entry` and `empty`. The
+cold walk below stands: no contract, no routing row and no product folder
+changed, and the 2 new lines in `CLAUDE.md` sit under `## Never`. The
+`status: approved` above is the fourth run's, kept on that reasoning, as the
+change-log did for the same 2 changes on 2026-09-25.
+
+## The checks, fourth run
 
 `bash _system/validate.sh video-pipeline`, exit 0. All 11 sections pass:
 structure, isolation, budget, routing, contracts, residue, hygiene, chain,

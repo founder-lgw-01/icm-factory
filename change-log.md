@@ -8,6 +8,28 @@ Newest first.
 
 ---
 
+## 2026-09-27, video-pipeline re-run for the 2026-09-25 changes, and shipped
+
+Owner's call: ship the video pipeline to a community member. `audit-builds.sh`
+named the build trailing on the 2 entries below of 2026-09-25 that re-ran
+`characterworldengine` only: `entry` (no `AGENTS.md`) and `blocks` (the
+`never-stem` line about `AGENTS.md` missing from `CLAUDE.md`). The build in
+`builds/` had not changed since its fourth emit on 2026-09-07; the factory had.
+
+`03_emit` re-ran from the same approved scaffold. A dry emit into a scratch
+folder was diffed against the old build first: 2 files differ, `CLAUDE.md` by
+the block's 2 lines and `AGENTS.md` new, 125 files byte for byte. The gate
+passed all 13 sections and `audit-builds.sh` reports 2 passing. The emit log
+and gate report carry a fifth-run note each and keep their approval on the
+same reasoning as the 2026-09-25 re-run.
+
+Changed: nothing in `_reference/`, `_templates/` or `_system/`.
+
+Builds re-run: `video-pipeline`, through `03_emit`. Shipped:
+`_dist/video-pipeline-2026-09-27.zip`.
+
+---
+
 ## 2026-09-25, the factory package is cut by a script
 
 Owner's call: cut a new factory package, since the one in `_dist/` predated

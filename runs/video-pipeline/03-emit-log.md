@@ -2,7 +2,7 @@
 slug: video-pipeline
 stage: 03_emit
 status: approved
-generated: 2026-09-07
+generated: 2026-09-27
 sources:
   - runs/video-pipeline/02-scaffold/manifest.md
   - _reference/blocks/
@@ -11,7 +11,15 @@ sources:
 
 # Emit log, video-pipeline
 
-Fourth emit, after the factory gated voice law 3 (digits) and began running a
+Fifth emit, 2026-09-27, after `audit-builds.sh` flagged the build as trailing
+on the 2 factory changes of 2026-09-25 (change-log, "every build ships
+`AGENTS.md`" and "the gate blocks an empty folder"). The scaffold did not
+change. 2 files differ from the fourth emit: `CLAUDE.md` carries the 2 new
+lines of the `never-stem` block, and `AGENTS.md` is new, a byte copy of
+`CLAUDE.md` made last, per `03_emit` step 8. Every other file is byte for byte
+the fourth emit; the diff was taken before the build was replaced.
+
+Fourth emit, 2026-09-07, after the factory gated voice law 3 (digits) and began running a
 build's own checks (change-log, 2026-09-07, "digits gated, and a build must pass
 its own checks"). 4 blocks changed for it (`never-stem`, `icm-credit`,
 `walk-test`, `icm-about-icm`) and the scaffold took repairs 6 to 8 in the
@@ -46,7 +54,7 @@ block: walk-test -> _reference/walk-test.md
 No `status:` frontmatter of the factory's own was present in the scaffold; the
 build's files carry none until a run writes them.
 
-## Files written, 126
+## Files written, 127
 
 - `00-START-HERE.md`
 - `01_gameplan/CONTEXT.md`
@@ -58,6 +66,7 @@ build's files carry none until a run writes them.
 - `07_final-render/CONTEXT.md`
 - `08_package/CONTEXT.md`
 - `09_blog/CONTEXT.md`
+- `AGENTS.md`
 - `CLAUDE.md`
 - `CONTEXT.md`
 - `PLAYBOOK.md`
