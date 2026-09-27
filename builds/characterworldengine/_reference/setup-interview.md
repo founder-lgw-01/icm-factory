@@ -5,6 +5,11 @@ none skipped. World mode asks parts 1 to 4. Character mode asks part 4 for the
 new character only. An answer of "I don't know" is recorded as `unknown` and
 lands under **Open** in the bible; it is never filled in by guessing.
 
+Revision mode asks none of these by default. It starts from the approved
+facts, asks only the questions the named change leaves unresolved, and appends
+the instruction, the questions, and the answers to `world/interview.md` as a
+dated section. History is never rewritten to look current.
+
 Where an answer is in the reference images rather than in words, ask the
 operator to point at the image: "which image shows the face straight on?"
 That image becomes the `stated` source.
@@ -16,12 +21,22 @@ That image becomes the `stated` source.
 3. What kind of place is it, in a sentence?
 4. What colors dominate? What colors are accents? What color never appears?
 5. What are things made of? How do surfaces wear?
-6. What shapes recur: buildings, landscape, plants, vehicles?
+6. What shapes recur: buildings, landscape, plants, vehicles? Name each
+   architectural family on its own. Which is primary, where may a secondary
+   family appear, and which combinations or hybrids never occur?
 7. Name every location a shot could take place in. For each: what is there,
-   where does the light come from, what is underfoot?
+   which architectural family dominates, where does detail cluster, where does
+   the frame stay quiet, what enters and exits it and where do they lead,
+   where does the light come from, what is underfoot? Trace every route and
+   waterway to a source or ingress and to an outlet, egress, or off-frame
+   continuation.
 8. What does the light do at dawn, midday, dusk, night? Is there weather?
 9. What must never appear in this world?
-10. Which reference images show the world, and what does each show?
+10. Which reference images show the world? For each: is it direct evidence,
+    inspiration, or conflict-only; what may it lend, and in which domain
+    (architecture, composition, material, palette and light, medium); what
+    prominent detail must not transfer; which other references may it stand
+    beside? Each answer becomes a role in that image's record.
 
 ## Part 2, the look
 
@@ -32,6 +47,8 @@ That image becomes the `stated` source.
     much in focus?
 14. What aspect ratio is the default? Which others are allowed?
 15. Where do characters sit in frame? How much environment shows around them?
+    What reads first and second, where may detail cluster, and where does the
+    frame stay open?
 16. What must no image contain (lettering, watermarks, borders, anything
     else)?
 
@@ -47,8 +64,10 @@ That image becomes the `stated` source.
 Asked once per character. Character mode starts here.
 
 19. Name, role in the world, apparent age, who they are in a line.
-20. Which reference images show this character? For each: face straight on,
-    profile, full body, outfit, back, hands, any detail?
+20. Which reference images show this character? For each: is it direct
+    evidence, inspiration, or conflict-only; which trait does it control
+    (face straight on, profile, full body, outfit, back, hands, pose, prop);
+    what must not transfer? Identity, pose, and anatomy are separate roles.
 21. Silhouette: at a distance, with no face visible, what says it is them?
 22. Face, feature by feature: shape, skin tone, eyes, brows, nose, mouth,
     jaw, ears, marks. Point at the image for each if words are hard.
@@ -66,5 +85,6 @@ Asked once per character. Character mode starts here.
 ## Closing
 
 32. Read back the list of `unknown` answers. Ask each once more. What is still
-    unknown lands under **Open** and blocks nothing; the operator settles it at
+    unknown lands under **Open**. It does not block writing the draft; it
+    blocks approval of the file it sits in until the operator settles it at
     the human check.

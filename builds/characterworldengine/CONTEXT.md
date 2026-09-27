@@ -1,20 +1,20 @@
 # Character World Engine, the line
 
-The flow in 1 line: a world is set up once → a shot brief → a spec → a render
-and a drift check → the image filed into its set.
+The flow in 1 line: a world is set up once → a shot brief → a spec that hashes
+the world files it read → a render and a drift check → the image filed into
+its set.
 
 | Stage | Job | Input | Output | Human check |
 |---|---|---|---|---|
-| `00_setup` | interview, then write the bibles; once per world, once per added character | answers, `world/references/` | `world/environment.md`, `world/style.md`, `world/characters/<name>.md` | confirm every `inferred` line against an image |
-| `01_spec` | brief to spec: brief, characters, scene, camera, at risk, prompt | `runs/<set>/<shot>/00-brief.md` | `runs/<set>/<shot>/01-spec-N.md` | every risk is guarded in the prompt |
-| `02_render` | send the prompt, save the image, check drift per character | the approved spec | `runs/<set>/<shot>/02-image-N.<ext>`, `runs/<set>/<shot>/02-render-N.md` | walk the drift checklist; write the verdict |
+| `00_setup` | interview, then write the world; again per character; revise by name | answers, `world/references/` | under `world/`: the router and modules, the style rules, 1 bible per character, 1 record per image | confirm every `inferred` line against an image; approve file by file |
+| `01_spec` | brief to spec: brief, manifest, characters, scene, camera, at risk, prompt | `runs/<set>/<shot>/00-brief.md`, the world files it selects | `runs/<set>/<shot>/01-spec-N.md` | every risk guarded in the prompt; every file read is in the manifest |
+| `02_render` | verify the manifest, send the prompt unchanged, save the image, check drift | the approved spec | `runs/<set>/<shot>/02-image-N.<ext>`, `runs/<set>/<shot>/02-render-N.md` | walk the drift checklist; write the verdict |
 | `03_file` | file the accepted image into its set | the record with `verdict: accepted` | `runs/<set>/<shot>/03-sidecar.md`, 1 line in `runs/<set>/manifest.md` | read the sidecar's prompt against the record |
 
-Each stage's contract is the `CONTEXT.md` in its folder. A `verdict: drifted`
-sends the shot back to `01_spec`, which writes attempt N+1 from the drift
-notes. Every attempt keeps its files.
+A `verdict: drifted` sends the shot back to `01_spec` for attempt N+1. Every
+attempt keeps its files.
 
-Factory (stable, every run): `_reference/`, `_templates/`, and `world/` once approved
+Factory (stable, every run): `_reference/`, `_templates/`, `tests/`, and `world/` once approved
 Product (new each run): `runs/<set>/<shot>/`, numbered by the stage that wrote each file
 
 ## Status is whatever exists
@@ -26,11 +26,16 @@ A stage refuses to run until the stage before it is approved. Status lives
 nowhere else: there is no tracker, no board, no separate state file. To know
 where a run stands, look at what is on disk.
 
+Here the operator may also decide by naming the file in chat; the agent writes
+it and reads it back. `_reference/approval.md` draws the line.
+
 ## Frontmatter
 
 Every shot output begins with `set`, `shot`, `attempt`, `stage`, `status`
-(`draft` | `approved`; you flip it), `generated`, `sources`. A setup output
-carries `world` instead of the first 3. A render record adds `verdict`.
+(`draft` | `approved`; the operator flips it), `generated`, `sources`. A world
+file carries `world` instead of the first 3, and adds `kind`, `scope`,
+`depends_on`, `reference_roles` as `_reference/bible-schema.md` defines. A
+render record adds `verdict`.
 
 ## Every output is an edit surface
 

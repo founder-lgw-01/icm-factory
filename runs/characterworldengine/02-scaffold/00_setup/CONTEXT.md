@@ -1,46 +1,50 @@
-# 00_setup, interview the operator, then write the bibles
+# 00_setup, interview the operator, then write the world
 
-1 job: turn reference images and the operator's answers into the bibles every
-shot reads. Runs once per world. Runs again, in character mode, for each
-character added later, and then writes 1 new character bible only.
+1 job: turn reference images and the operator's answers into the world files
+every shot reads. 3 modes: world, once; character, per added character;
+revision, a scoped change to named files.
 
 ## Inputs
-- Working (this run): the operator's answers, given in chat; the images in
-  `../world/references/`; the blank `../world/environment.md`,
-  `../world/style.md`, `../world/interview.md`
-- Working (character mode): `../world/environment.md`, `../world/style.md`,
-  every file in `../world/characters/`, for relative scale and shared wardrobe
+- Working (world mode): the operator's answers; the images in
+  `../world/references/`; the blank files under `../world/`
+- Working (character mode): `../world/environment/core.md`,
+  `../world/style.md`, every file in `../world/characters/`
+- Working (revision): the files the operator names, and no other
 - Reference (every run): `../_reference/setup-interview.md`,
-  `../_reference/bible-schema.md`, `../_templates/character-bible.md`
+  `../_reference/bible-schema.md`, `../_reference/approval.md`,
+  `../_templates/character-bible.md`, `location.md`, `reference-permissions.md`
 
-Do NOT load: any shot under `../runs/<set>/`, shots are downstream;
-`../_reference/spec-rules.md` and `../_reference/drift-checklist.md`, they read
-bibles and never write them.
+Do NOT load: any shot under `../runs/<set>/`; `../_reference/spec-rules.md`
+and `../_reference/drift-checklist.md`; in revision mode, any world file not
+named.
 
 ## Process
-1. World mode: refuse to run if `../world/environment.md` says
-   `status: approved`; this folder holds 1 world. Character mode: refuse
-   unless it does.
-2. Ask every question in `setup-interview.md`, in its order, a few at a time.
-   World mode asks all of them; character mode asks the character section only.
-   Write nothing until the last question is answered.
-3. Fill `../world/interview.md` with every question and its answer. Character
-   mode appends a section for the new character.
-4. Fill `../world/environment.md` and `../world/style.md` in place. For each
-   character, copy `character-bible.md` to `../world/characters/<name>.md` and
-   fill it. Every field comes from an image or an answer, marked `stated` or
-   `inferred` as `bible-schema.md` defines. Leave no field blank: write
-   `unknown` and list it under **Open**.
-5. Character mode: state the new character's height and build against each
-   existing character, by name.
+1. World mode: refuse if `../world/environment/core.md` says `status: approved`.
+   Character mode: refuse unless it does. Revision: refuse without an
+   instruction naming the files and the change; set those files to
+   `status: draft` and no other.
+2. Ask the questions `setup-interview.md` gives for the mode, in order, a few
+   at a time. Write nothing until the last answer is in.
+3. Append every question and answer to `../world/interview.md`; a revision
+   also appends the instruction, word for word.
+4. Fill `../world/environment.md`, `../world/environment/`, and
+   `../world/style.md` in place. Stamp `location.md` into
+   `../world/environment/locations/`, `character-bible.md` into
+   `../world/characters/`, `reference-permissions.md` into
+   `../world/references/`, 1 per location, character, image.
+   `bible-schema.md` says which file owns which fact; write each once.
+5. Every field comes from an image or an answer, marked `stated` or
+   `inferred`. Leave no field blank: write `unknown` and list it under **Open**.
+   Character mode: state height and build against each existing character.
 
 ## Outputs
-- `../world/interview.md`, `../world/environment.md`, `../world/style.md`,
-  `../world/characters/<name>.md`, frontmatter: `world`, `stage: 00_setup`,
-  `status: draft`, `generated`, `sources` (each image and answer used)
+- Step 4's files, frontmatter: `world`, `stage: 00_setup`, `status: draft`,
+  `generated`, `sources`, `kind`, `scope`, `depends_on`, `reference_roles`; a
+  reference record adds `image`.
 
 ## Human check
-Open each bible beside the images in `../world/references/`. For every line
-marked `inferred`, confirm it against an image or rewrite it; strike any line an
-image contradicts; answer or strike every line under **Open**. Flip
-`status: approved` on each file.
+Open each file beside the images in `../world/references/`. For every line
+marked `inferred`, confirm it against an image or rewrite it; strike any line
+an image contradicts; answer or strike every line under **Open**; read each
+record's **Do not transfer** cell against its image. Flip `status: approved`
+on each file, 1 at a time.
