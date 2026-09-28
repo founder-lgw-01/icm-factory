@@ -207,3 +207,8 @@ https://arxiv.org/abs/2603.16021
 
 The method itself is vendored in `_source-corpus/ICM-architect/`. This factory is
 an application of it, not a replacement for it.
+
+## License
+
+MIT, in `LICENSE`. The vendored method keeps its own MIT license inside
+`_source-corpus/ICM-architect/`, in the authors' names.

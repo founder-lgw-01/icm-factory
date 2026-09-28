@@ -42,7 +42,7 @@ done
 
 # ---------- copy ----------
 mkdir -p "$COPY/_source-corpus"
-cp "$ROOT/CLAUDE.md" "$ROOT/CONTEXT.md" "$ROOT/README.md" "$COPY/"
+cp "$ROOT/CLAUDE.md" "$ROOT/CONTEXT.md" "$ROOT/README.md" "$ROOT/LICENSE" "$COPY/"
 cp -r "$ROOT/stages" "$ROOT/_reference" "$ROOT/_templates" "$ROOT/_system" "$COPY/"
 cp -r "$ROOT/_source-corpus/ICM-architect" "$COPY/_source-corpus/"
 rm -rf "$COPY/_source-corpus/ICM-architect/.git"

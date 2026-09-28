@@ -8,6 +8,20 @@ Newest first.
 
 ---
 
+## 2026-09-27, MIT license at the root
+
+Owner's call: license the factory MIT, on GitHub. `LICENSE` at the root, in
+the owner's name, with a closing note that the vendored method in
+`_source-corpus/ICM-architect/` keeps its own MIT license in its authors'
+names. `README.md` gains a License section.
+
+Changed: `_system/package.sh` copies `LICENSE` into the buyer package with the
+other root files.
+
+Builds affected: none. A build carries the ICM credit block, not this license.
+
+---
+
 ## 2026-09-27, the 2 outside test reports, applied
 
 Owner's call: apply every improvement the 2 outside test reports recommended,
