@@ -19,13 +19,17 @@
 #   empty       no empty folder; a zip drops it, so the build unpacked is not the build gated
 #   hygiene     the factory's own stages/ holds contracts only (a factory fault, not the build's)
 #   chain       the run behind the build is status: approved at every stage
+#   print       the scaffold still matches the sha256 print in the emit log
 #   blocks      every block the emit log names matches its single home, verbatim
 #   voice       the writing laws hold (voice-check.sh); digits on authored files only
 #   self-checks the build passes the checks it ships (check: lines in the manifest)
 #
 # Skipped on purpose: Unix absolute paths outside markdown links, because shebangs
 # and /tmp are legitimate in scripts. A path carrying a <placeholder> is not a
-# literal path and is never resolved. Probes for every check live in test-gate.sh.
+# literal path and is never resolved. Nothing under the build's own runs/<unit>/
+# is read by any check: after use it holds an owner's or a customer's words, which
+# no law here governs; runs/README.md is the factory's note and is read. Probes
+# for every check live in test-gate.sh.
 
 SLUG="${1:?usage: validate.sh <slug>}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -51,12 +55,15 @@ tokens() { echo $(( $(wc -c < "$1") / 4 )); }
 echo "gate: builds/$SLUG"
 echo
 
-# every text file in the build, one per line; grep -I decides what is binary
-TEXT=$(find "$BUILD" -type f -print0 2>/dev/null | while IFS= read -r -d '' f; do LC_ALL=C grep -Iq . "$f" 2>/dev/null && printf '%s\n' "$f"; done)
+# every text file in the build, one per line; grep -I decides what is binary.
+# The agent's own runs, runs/<unit>/, are pruned: see the header.
+TEXT=$(find "$BUILD" -type d -path "$BUILD/runs/*" -prune -o -type f -print0 2>/dev/null | while IFS= read -r -d '' f; do LC_ALL=C grep -Iq . "$f" 2>/dev/null && printf '%s\n' "$f"; done)
+TEXTMD=$(printf '%s\n' "$TEXT" | grep '\.md$')
 stages=$(find "$BUILD" -maxdepth 1 -type d -name '[0-9][0-9]_*' 2>/dev/null | sort)
+scan()   { printf '%s\n' "$1" | xargs -r -d '\n' grep "${@:2}" 2>/dev/null; }  # grep over a file list, never over the tree
 
 # ---------- structure ----------
-for req in CLAUDE.md CONTEXT.md README.md; do
+for req in CLAUDE.md CONTEXT.md README.md runs/README.md; do
   [ -f "$BUILD/$req" ] || bad "structure: missing $req"
 done
 [ -d "$BUILD/_reference" ] || bad "structure: missing _reference/"
@@ -91,13 +98,13 @@ while IFS= read -r f; do
   [ -n "$hits" ] && { bad "isolation: $rel climbs out of the build"; echo "$hits"; iso=1; }
 done <<< "$TEXT"
 # b. the factory's name, in any spelling: icm-factory, ICM Factory, icm_factory, ICMFactory
-hits=$(grep -rnIiE 'icm[-_ ]?factory' "$BUILD" 2>/dev/null | head -5)
+hits=$(scan "$TEXT" -nHiE 'icm[-_ ]?factory' | head -5)
 [ -n "$hits" ] && { bad "isolation: names the factory"; echo "$hits"; iso=1; }
 # c. Windows absolute paths in any text file; a path carrying a <placeholder> is not literal
-hits=$(grep -rnIE '(^|[^A-Za-z0-9])[A-Za-z]:[\\/]' "$BUILD" 2>/dev/null | grep -vE '[A-Za-z]:[\\/][^[:space:]]*<' | head -5)
+hits=$(scan "$TEXT" -nHE '(^|[^A-Za-z0-9])[A-Za-z]:[\\/]' | grep -vE '[A-Za-z]:[\\/][^[:space:]]*<' | head -5)
 [ -n "$hits" ] && { bad "isolation: absolute path"; echo "$hits"; iso=1; }
 # d. a Unix absolute path as a markdown link target; ](//host) is protocol-relative and not a path
-hits=$(grep -rnE '\]\(/[^/)]' "$BUILD" --include='*.md' 2>/dev/null | head -5)
+hits=$(scan "$TEXTMD" -nHE '\]\(/[^/)]' | head -5)
 [ -n "$hits" ] && { bad "isolation: markdown link to an absolute path"; echo "$hits"; iso=1; }
 [ "$iso" -eq 0 ] && good "isolation: no path leaves the build"
 
@@ -180,7 +187,7 @@ while IFS= read -r f; do
   h=$(grep -n '^BLOCK:' "$f" | head -3); [ -n "$h" ] && { bad "residue: unresolved BLOCK marker in ${f#$BUILD/}"; echo "$h"; rs=1; }
   h=$(grep -n '{{' "$f" | head -3);      [ -n "$h" ] && { bad "residue: unfilled {{slot}} in ${f#$BUILD/}"; echo "$h"; rs=1; }
 done <<< "$AUTHORED"
-hits=$(grep -rnE '^stage: 0[0-4]_(intake|form|scaffold|emit|validate)' "$BUILD" --include='*.md' 2>/dev/null | head -5)
+hits=$(scan "$TEXTMD" -nHE '^stage: 0[0-4]_(intake|form|scaffold|emit|validate)' | head -5)
 [ -n "$hits" ] && { bad "residue: factory stage frontmatter left in build"; echo "$hits"; rs=1; }
 stray=$(find "$BUILD" -maxdepth 1 \( -iname 'manifest.md' -o -iname 'skeleton.md' \) 2>/dev/null)
 [ -n "$stray" ] && { bad "residue: scaffold file shipped in the build"; echo "$stray"; rs=1; }
@@ -189,9 +196,10 @@ stray=$(find "$BUILD" -maxdepth 1 \( -iname 'manifest.md' -o -iname 'skeleton.md
 # ---------- empty ----------
 # An empty folder is always a scaffold leftover, and a zip drops it, so a build
 # that passes with one is not the build a recipient unpacks. Found by the cold
-# walk on characterworldengine, 2026-09-25.
+# walk on characterworldengine, 2026-09-25. A unit's own folders under runs/ are
+# the agent's business, not the scaffold's.
 ef=0
-hits=$(find "$BUILD" -mindepth 1 -type d -empty 2>/dev/null | head -5)
+hits=$(find "$BUILD" -mindepth 1 -type d -path "$BUILD/runs/*" -prune -o -mindepth 1 -type d -empty -print 2>/dev/null | head -5)
 [ -n "$hits" ] && { bad "empty: folder with nothing in it; remove it from the scaffold and re-emit"; echo "$hits"; ef=1; }
 [ "$ef" -eq 0 ] && good "empty: no empty folder"
 
@@ -220,12 +228,36 @@ for f in 00-intake.md 01-plan.md 02-scaffold/manifest.md 03-emit-log.md; do
 done
 [ "$ch" -eq 0 ] && good "chain: every stage output approved"
 
+# ---------- print ----------
+# The emit log carries 1 sha256 line per scaffold file under ## Scaffold print,
+# as sha256sum prints it from runs/<slug>/02-scaffold/. Recomputed here, so a
+# scaffold edited after emit, a file added or lost, or a log with no print all
+# block. It proves the build came from this scaffold and no other.
+pr=0
+LOG="$RUN/03-emit-log.md"
+SCAF="$RUN/02-scaffold"
+if [ ! -f "$LOG" ]; then bad "print: runs/$SLUG/03-emit-log.md is missing"; pr=1
+elif [ ! -d "$SCAF" ]; then bad "print: runs/$SLUG/02-scaffold/ is missing"; pr=1
+else
+  printed=$(awk '/^## Scaffold print/{f=1; next} /^## /{f=0} f' "$LOG" | tr -d '\r' | grep -E '^[0-9a-f]{64} [ *]' | sed -E 's/^([0-9a-f]{64}) [ *](\.\/)?/\1  /' | sort)
+  if [ -z "$printed" ]; then
+    bad "print: the emit log has no ## Scaffold print; re-emit"; pr=1
+  else
+    actual=$(cd "$SCAF" && find . -type f -print0 | sort -z | xargs -0 sha256sum | sed -E 's/^([0-9a-f]{64}) [ *](\.\/)?/\1  /' | sort)
+    if [ "$printed" != "$actual" ]; then
+      bad "print: the scaffold no longer matches the emit log's print; re-emit, never patch"
+      diff <(printf '%s\n' "$printed") <(printf '%s\n' "$actual") | grep -E '^[<>]' | sed 's/^</  in log:  /; s/^>/  on disk: /' | head -6
+      pr=1
+    fi
+  fi
+fi
+[ "$pr" -eq 0 ] && good "print: the scaffold matches the emit log"
+
 # ---------- blocks ----------
 # Every block the emit log names must still match _reference/blocks/<name>.md, so
 # a block edit fails every shipped build that carries the old text. Every block
 # marked every-build: yes must be in the log; walk-test when the build has 3+ stages.
 bk=0
-LOG="$RUN/03-emit-log.md"
 body_of() { awk 'NR==1 && /^---[[:space:]]*$/ {fm=1; next} fm && /^---[[:space:]]*$/ {fm=0; next} !fm' "$1"; }
 flat()    { tr '\n\r' '  ' | tr -s ' ' | sed -E 's/^ //; s/ $//'; }
 if [ ! -d "$LIB" ]; then

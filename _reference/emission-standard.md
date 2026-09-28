@@ -26,10 +26,11 @@ That means, with no exceptions:
 | `CLAUDE.md` | identity in 2 lines, "where am I", a routing table, `## Never` | < 800 tokens, < 60 lines |
 | `AGENTS.md` | `CLAUDE.md`, byte for byte; written by `03_emit`, never by hand | same as `CLAUDE.md` |
 | `CONTEXT.md` | the whole line as 1 table; factory/product split; status; naming | < 800 tokens |
-| `README.md` | what this agent does, how to start a run, the ICM credit | no budget |
+| `README.md` | what this agent does, how to start a run, the ICM credit; written by `02_scaffold` with the interview open, kept as is by `03_emit` | no budget |
 | `<NN_stage>/CONTEXT.md` | 1 per stage, the contract | < 650 tokens each |
 | `_reference/` | the stable rules this agent obeys | - |
 | `_templates/` | blank starters, if the agent instantiates anything | - |
+| `runs/README.md` | the note that makes `runs/` exist before the first run, so every route to it resolves | no budget |
 
 ## 2 entry files, 1 home
 
@@ -69,13 +70,44 @@ never ships `.hermes.md`, because it would outrank both.
   machine; there is no tracker.
 - **Outputs land in `runs/<unit>/`**, numbered by the stage that wrote them.
   Stage folders hold contracts only, so a run leaves nothing behind in a stage
-  and cannot reach another run. Routing rows name that folder with its
-  placeholder, `runs/<unit>/`, because it exists only once a run has happened.
+  and cannot reach another run. The build ships `runs/` with its note inside;
+  routing rows name a unit's folder with its placeholder, `runs/<unit>/`.
+- **The operator's words ship verbatim.** Voice, offers and sign-off from
+  intake go into the built agent's `_reference/` inside a fenced block, where
+  the digit law does not reach, so the owner's own numbers survive untouched.
+- **Talking to a person means a privacy rule.** When intake's **Who it talks
+  to** names a person, the plan names a `_reference/` file for what the agent tells
+  them, what it never writes down, removal on request, and how a run stops.
 - **Every output is an edit surface.** A plain file a person opens, edits, saves.
   The next stage reads whatever the human left there.
 - **Generated files are never hand-edited.** If a file is built by a script, the
   rule against editing it lives in that build's `## Never`.
 - **1 home per fact.** A link beats a copy, inside a build as much as outside it.
+
+## A rebuild keeps the runs
+
+An agent's runs live inside it, under `runs/`, and a re-emit must never delete
+them. Before removing the old build, `03_emit` moves `builds/<slug>/runs/` to
+`runs/<slug>/kept-runs/` and deletes the old `04-gate-report.md`, so the rebuilt
+build is gated fresh rather than vouched for by a stale report. After
+`AGENTS.md` is written, every unit in `kept-runs/` moves back into the new
+`runs/`, last, and `kept-runs/` is removed. The emit log names the count moved.
+
+The gate reads nothing under `runs/<unit>/`. After use it holds an owner's or a
+customer's own words, which no voice law governs and no isolation rule may
+block. `runs/README.md` is the exception: the factory wrote it, so it is read.
+`ship.sh` leaves every unit out of the zip for the same reason. A hand-over
+carries the agent, never the work it did for someone.
+
+## Scaffold print
+
+The emit log carries, under `## Scaffold print`, 1 line per file in
+`runs/<slug>/02-scaffold/`, in the form `sha256sum` prints when run from that
+folder: `<sha256>  <path>`. The gate recomputes every line and blocks on a
+difference, an added file or a lost one, or a log with no print. It proves the
+build in `builds/` came from this scaffold and no other. A scaffold edited after
+emit trails until it is re-emitted, which is the only way an edit reaches a
+build.
 
 ## Blocks
 
@@ -83,7 +115,9 @@ Text that appears in more than 1 built agent is a block. Blocks live in
 `_reference/blocks/`, 1 file each, and `03_emit` copies them in verbatim.
 
 `02_scaffold` marks the spot with `BLOCK: <name>` on its own line and writes
-nothing else there. A block is never hand-authored into a scaffold and never
+nothing else there. `01_form` and `02_scaffold` read the index,
+`_reference/blocks/README.md`, to name the blocks a build needs, and nothing
+else in that folder. A block is never hand-authored into a scaffold and never
 edited inside a build. That is precisely the drift this factory exists to
 prevent. To change a block: edit `_reference/blocks/<name>.md`, log it in
 `change-log.md`, re-run the affected builds, and let `_system/audit-builds.sh`

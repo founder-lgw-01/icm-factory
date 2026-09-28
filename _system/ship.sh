@@ -17,6 +17,9 @@
 # that is deleted. Empty folders are not carried by a zip; the gate's `empty`
 # check is what keeps a build from relying on one.
 #
+# The agent's own work, everything under runs/ but its README.md, is left out.
+# A hand-over carries the agent, never what it did for someone.
+#
 # Needs python 3 for the zip itself; neither zip nor 7z is assumed on the machine.
 
 SLUG="${1:?usage: ship.sh <slug>}"
@@ -58,8 +61,12 @@ while [ -e "$OUT" ]; do n=$((n + 1)); OUT="$DIST/$SLUG-$DATE-v$n.zip"; done
 import os, sys, zipfile
 build, out, slug = sys.argv[1:4]
 files = {}
+runs = os.path.join(build, "runs")
 for root, dirs, names in os.walk(build):
     dirs.sort()
+    if root == runs:
+        dirs[:] = []                              # the agent's own units stay home
+        names = [n for n in names if n == "README.md"]
     for name in sorted(names):
         path = os.path.join(root, name)
         files[slug + "/" + os.path.relpath(path, build).replace(os.sep, "/")] = path
@@ -78,7 +85,8 @@ if problems:
     os.remove(out)
     print("\n".join(problems))
     sys.exit(1)
-print(f"{len(files)} files")
+kept = sum(len(n) for r, d, n in os.walk(runs) if r != runs) if os.path.isdir(runs) else 0
+print(f"{len(files)} files" + (f", {kept} run files left out" if kept else ""))
 EOF
 rc=$?
 if [ "$rc" -ne 0 ]; then

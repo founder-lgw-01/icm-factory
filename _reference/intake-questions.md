@@ -40,6 +40,26 @@ marks each answer `stated` or `inferred`.
    *This decides how much routing the build needs. If the answer is "nobody", the
    `CLAUDE.md` can be thin.*
 
+## The 3 that decide what the agent carries
+
+8. **Who is on the other end of a run?** A customer, an employee, the owner,
+   nobody. *If a person: the built agent carries a privacy rule in its
+   `_reference/`: what it tells them, what it never writes down, removal on
+   request, and how a run stops. A build without it improvises the first time
+   someone reads out a card number.*
+
+9. **Where does the agent's truth come from?** A file it is handed, a person it
+   interviews, or its own notes. *An agent that writes the record and then checks
+   its work against that record proves consistency, not fidelity. Say so under
+   **Open questions**, and name what could capture the source mechanically.*
+
+10. **What must it sound like, what does it sell, and how does it sign off?**
+    *Voice, each offer with what it includes and what it costs, the sign-off.
+    Take these down word for word. They ship inside a fenced block in the built
+    agent's `_reference/`, so the operator's own numbers and phrasing pass the
+    voice check untouched. Heard nothing on voice: the build ships no voice file
+    rather than an invented one.*
+
 ## Follow-ups worth asking when the answer is thin
 
 - What goes wrong most often, and at which step?
@@ -61,6 +81,8 @@ identical shape; nothing downstream can tell which door was used.
 | **Stable vs new** | same every run (voice, rules, schema) vs new every run |
 | **What ships** | the artifact that leaves the built agent |
 | **Who else touches it** | and what they need to find without asking |
+| **Who it talks to** | the person on the other end, if any, and where the agent's truth comes from |
+| **The owner's words** | voice, offers, sign-off: verbatim, inside a fenced block |
 | **Open questions** | what the interview or the material did not settle |
 
 Their pauses become stage boundaries. Their "I always check X before Y" becomes a
@@ -70,7 +92,7 @@ human gate. Their "it always has to sound like Z" becomes the built agent's own
 ## Door B: reading a folder instead of a person
 
 Inventory before touching anything: every file, what it is, what refers to it.
-Then answer the 7 questions from evidence.
+Then answer the 10 questions from evidence.
 
 - The repeating unit is usually visible as the thing the folder has many of.
 - Stage boundaries show up as the order files were meant to be read in.

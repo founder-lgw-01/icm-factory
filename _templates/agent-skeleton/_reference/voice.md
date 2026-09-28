@@ -9,6 +9,14 @@ delete this file rather than inventing rules.}}
 1. {{a rule stated so a script could check it}}
 2. {{...}}
 
+## In their words
+
+```text
+{{Voice, offers and sign-off exactly as intake took them down, from The owner's
+words. Fenced, so the digit law leaves the owner's own numbers alone. Delete
+this section if intake heard nothing.}}
+```
+
 ## Shape
 
 {{Length, structure, what a finished piece looks like.}}

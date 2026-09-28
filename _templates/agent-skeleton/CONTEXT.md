@@ -6,8 +6,8 @@ The flow in 1 line: {{input}} → {{step}} → {{step}} → {{what ships}}.
 |---|---|---|---|---|
 | `NN_stage` | {{1 line}} | {{exact path}} | {{exact path}} | {{what a person does}} |
 
-Each stage's contract is `NN_stage/CONTEXT.md`: what it reads, what it must not
-load, what it does, what it writes, what a person checks.
+Each stage folder holds its contract in a `CONTEXT.md`: what it reads, what it
+must not load, what it does, what it writes, what a person checks.
 
 Factory (stable, every run): `_reference/`, `_templates/`
 Product (new each run): `runs/{{unit}}/`, numbered by the stage that wrote each file

@@ -11,8 +11,11 @@
 #
 # The fixture is a throwaway mirror under $TMPDIR: a copy of _system/ and
 # _reference/, a clean stages/, builds/fixture/ with every every-build block
-# resolved, and runs/fixture/ with 4 approved run files, a manifest saying
-# check: none, and an emit log. Nothing under this factory is touched.
+# resolved and a runs/ note, and runs/fixture/ with 4 approved run files, a
+# manifest saying check: none, and an emit log whose scaffold print is stamped
+# from the scaffold as it stands. A probe that edits the scaffold on purpose
+# calls stamp afterwards, so it tests only its own case. Nothing under this
+# factory is touched.
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 EM=$(printf '\xe2\x80\x94')
@@ -22,9 +25,14 @@ wrong=0; n=0
 
 body() { awk 'NR==1 && /^---/ {fm=1; next} fm && /^---/ {fm=0; next} !fm' "$ROOT/_reference/blocks/$1.md"; }
 
+stamp() {  # rewrites ## Scaffold print in the fixture's emit log from the scaffold as it is now
+  sed -i '/^## Scaffold print/,$d' "$R/03-emit-log.md"
+  { echo '## Scaffold print'; (cd "$R/02-scaffold" && find . -type f -print0 | sort -z | xargs -0 sha256sum); } >> "$R/03-emit-log.md"
+}
+
 fresh() {
   rm -rf "$M"
-  mkdir -p "$M/_system" "$M/stages/00_x" "$B/01_step" "$B/_reference" "$R/02-scaffold"
+  mkdir -p "$M/_system" "$M/stages/00_x" "$B/01_step" "$B/_reference" "$B/runs" "$R/02-scaffold"
   cp "$ROOT/_system/validate.sh" "$ROOT/_system/voice-check.sh" "$M/_system/"
   cp -r "$ROOT/_reference" "$M/_reference"
   : > "$M/stages/00_x/CONTEXT.md"
@@ -62,6 +70,9 @@ Do NOT load: anything else.
 Read `01-out.md` against the brief, line by line. Flip `status: approved`.
 EOF
   printf '# Rules\n\nBe brief.\n' > "$B/_reference/rules.md"
+  printf '# Runs\n\nEvery run lands here, 1 folder per unit.\n' > "$B/runs/README.md"
+  printf '# Fixture, the line\n\nBLOCK: naming\n' > "$R/02-scaffold/CONTEXT.md"
+  stamp
 }
 
 expect() {  # $1 PASS|FAIL, $2 label: gates the current fixture and scores the outcome
@@ -110,13 +121,19 @@ fresh; printf '\nSee [x](/_reference/rules.md)\n' >> "$B/_reference/rules.md";  
 fresh; printf -- '---\nslug: fixture\nstatus: draft\n---\nstatus: approved\n' > "$R/01-plan.md"; expect FAIL "approval quoted in the body, frontmatter says draft"
 fresh; printf '\nRead the two files.\n' >> "$B/_reference/rules.md";                              expect FAIL "spelled-out number in authored prose"
 fresh; printf '\n## Two notes\n' >> "$B/_reference/rules.md";                                     expect FAIL "spelled-out number in a heading"
-fresh; sed -i '/^check: none/d' "$R/02-scaffold/manifest.md";                                   expect FAIL "manifest with no check: line"
-fresh; sed -i 's|^check: none|check: false {file} :: README.md|' "$R/02-scaffold/manifest.md";  expect FAIL "self-check that exits nonzero"
-fresh; sed -i 's|^check: none|check: test -f {file} :: nothing-*.md|' "$R/02-scaffold/manifest.md"; expect FAIL "self-check whose files match nothing"
-fresh; printf 'check: test -f {file} :: README.md\n' >> "$R/02-scaffold/manifest.md";           expect FAIL "check: none beside a real check"
+fresh; sed -i '/^check: none/d' "$R/02-scaffold/manifest.md"; stamp;                            expect FAIL "manifest with no check: line"
+fresh; sed -i 's|^check: none|check: false {file} :: README.md|' "$R/02-scaffold/manifest.md"; stamp; expect FAIL "self-check that exits nonzero"
+fresh; sed -i 's|^check: none|check: test -f {file} :: nothing-*.md|' "$R/02-scaffold/manifest.md"; stamp; expect FAIL "self-check whose files match nothing"
+fresh; printf 'check: test -f {file} :: README.md\n' >> "$R/02-scaffold/manifest.md"; stamp;    expect FAIL "check: none beside a real check"
 fresh; rm -f "$B/AGENTS.md";                                                                   expect FAIL "AGENTS.md missing"
 fresh; printf '\n- A line added by hand.\n' >> "$B/AGENTS.md";                                 expect FAIL "AGENTS.md hand-edited away from CLAUDE.md"
 fresh; mkdir -p "$B/01_step/references";                                                       expect FAIL "empty folder inside the build"
+fresh; rm -rf "$B/runs";                                                                       expect FAIL "build with no runs/ note"
+fresh; printf '\nA note %s here.\n' "$EM" >> "$B/runs/README.md";                              expect FAIL "em dash in the runs/ note, which the factory wrote"
+fresh; printf '\nA line added later.\n' >> "$R/02-scaffold/CONTEXT.md";                         expect FAIL "scaffold file edited after the emit"
+fresh; printf '# Extra\n' > "$R/02-scaffold/extra.md";                                         expect FAIL "scaffold file added after the emit"
+fresh; rm -f "$R/02-scaffold/CONTEXT.md";                                                      expect FAIL "scaffold file lost after the emit"
+fresh; sed -i '/^## Scaffold print/,$d' "$R/03-emit-log.md";                                   expect FAIL "emit log with no scaffold print"
 
 # ---- must PASS: legitimate look-alikes ----
 fresh; mkdir -p "$B/skills/x"; printf 'const a = s.replace(/data:image/, "x");\n' > "$B/skills/x/tool.mjs";   expect PASS "JS regex literal in a code file"
@@ -135,7 +152,10 @@ fresh; printf '\nSee `one-video.md` and `two.sh`.\n' >> "$B/_reference/rules.md"
 fresh; printf '\n```\nthree = 3\n```\n' >> "$B/_reference/rules.md";                                             expect PASS "spelled-out number inside a fenced block"
 fresh; printf '\nPick the one you need, and no one else.\n' >> "$B/_reference/rules.md";                         expect PASS "one doing a pronoun's job"
 fresh; mkdir -p "$B/skills/x"; printf 'Take two.\n' > "$B/skills/x/README.md";                                   expect PASS "spelled-out number in a copied skill file"
-fresh; sed -i 's|^check: none|check: test -f {file} :: README.md 01_step/CONTEXT.md|' "$R/02-scaffold/manifest.md"; expect PASS "self-checks that pass"
+fresh; sed -i 's|^check: none|check: test -f {file} :: README.md 01_step/CONTEXT.md|' "$R/02-scaffold/manifest.md"; stamp; expect PASS "self-checks that pass"
+fresh; mkdir -p "$B/runs/job-1"; printf 'Owner said %s this, see c:/x/y.md and the ICM Factory.\n' "$EM" > "$B/runs/job-1/01-out.md"; expect PASS "an owner's own words in a run: em dash, absolute path, the factory's name"
+fresh; mkdir -p "$B/runs/job-1/02-empty";                                                          expect PASS "empty folder inside a run is the agent's business"
+fresh; sed -i 's|^\([0-9a-f]\{64\}\)  \./|\1  |' "$R/03-emit-log.md";                               expect PASS "print lines written without the ./ prefix"
 
 echo
 if [ "$wrong" -eq 0 ]; then

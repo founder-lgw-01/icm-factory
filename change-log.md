@@ -8,6 +8,80 @@ Newest first.
 
 ---
 
+## 2026-09-27, the 2 outside test reports, applied
+
+Owner's call: apply every improvement the 2 outside test reports recommended,
+here, without importing the testers' scripts. Both testers ran the 2026-09-07
+package (11 gate checks; the 2026-09-25 package has 13). RyMac walked the
+factory cold 7 times on a roofing follow-up agent and fixed their copy as they
+went. A second builder built painfinder, an interview agent, and attacked it
+over 6 rounds. 6 of RyMac's 7 run-1 faults were still live here; painfinder's
+were faults of intake, not of the gate.
+
+From RyMac's report:
+- **A rebuild keeps the runs.** `03_emit` moves `builds/<slug>/runs/` to
+  `runs/<slug>/kept-runs/` before removing the old build, deletes the stale
+  gate report, and moves every unit back last. Before this, the contract said
+  "remove it first" and a rebuilt agent lost every job it had run.
+- **Every build ships `runs/README.md`.** The skeleton carries the note, the
+  gate's `structure` check requires it, and so every route to `runs/` resolves
+  before the first run. The skeleton's root `CONTEXT.md` and `CLAUDE.md` no
+  longer name `NN_stage/CONTEXT.md`, a path no build can resolve.
+- **The gate reads nothing under `runs/<unit>/`.** After use it holds an
+  owner's or a customer's words. `validate.sh` prunes it from every scan,
+  `voice-check.sh` prunes it in folder mode, and `ship.sh` leaves it out of the
+  zip. `runs/README.md` is the factory's and is still read.
+- **Scaffold print.** New gate section, `print`: the emit log carries a
+  `sha256sum` line per scaffold file under `## Scaffold print`, and the gate
+  recomputes it. A scaffold edited after emit, a file added or lost, or a log
+  with no print, blocks. RyMac did this with a script; here it is 1 step in
+  `03_emit` and 1 section in the gate. 14 sections now.
+- **Stages 1 and 2 read the block index.** `_reference/blocks/README.md` is
+  now a reference input to both; the bodies stay do-not-load. Before, `01_form`
+  had to write **Blocks needed** without being allowed to see the list.
+- **Stage 2 owns the README.** It writes `README.md` with the interview open;
+  `03_emit` resolves its block and changes nothing else. Before, stage 3 wrote
+  it while forbidden to read the interview, and stage 2 never mentioned it.
+- **The voice check runs while the scaffold is written**, step 9 of
+  `02_scaffold`, so a bad line is fixed before it costs a rebuild.
+- **Naming.** The `naming` block and the factory's own `CONTEXT.md` said "no
+  punctuation" beside slugs written with hyphens. Now: lowercase words joined
+  with hyphens, nothing else.
+
+From the painfinder report:
+- **3 intake questions**, 8 to 10 in `intake-questions.md`: who is on the
+  other end of a run (a person means a privacy rule in the plan), where the
+  agent's truth comes from (a self-written record proves consistency, not
+  fidelity, and goes under **Open questions**), and the owner's voice, offers
+  and sign-off, taken down word for word. 2 new intake sections carry them,
+  **Who it talks to** and **The owner's words**; the latter ships verbatim in a
+  fenced block, where the digit law does not reach. The skeleton's `voice.md`
+  has the slot. RyMac's report asked for the owner's words too.
+- **The stage 2 human check reads paired rules side by side.** Painfinder
+  shipped 2 rules on money that disagreed, and the agent found it, not the
+  gate. The gate cannot read meaning; the human check now says where to look.
+
+Not done, on purpose: a gate rule that a check a build ships must ship with
+the cases it has to fail. Painfinder's quote checker leaked 27 of 28 fakes
+before it was rebuilt, and fixtures would have shown that at round 4. It needs
+a manifest form and a probe, and is its own entry when it comes.
+
+Changed: `_reference/intake-questions.md`, `_reference/emission-standard.md`
+(3 new sections: a rebuild keeps the runs, scaffold print, README ownership in
+the file table), `_reference/blocks/naming.md`, `_reference/blocks/README.md`,
+`_templates/agent-skeleton/` (`runs/README.md` new; `CONTEXT.md`, `CLAUDE.md`,
+`SKELETON.md`, `_reference/voice.md`), every stage contract but `04_validate`,
+each within 650 tokens, `_system/validate.sh` (`print` section; `structure`
+requires `runs/README.md`; every scan pruned of `runs/<unit>/`),
+`_system/voice-check.sh`, `_system/ship.sh`, `_system/test-gate.sh` (a `stamp`
+helper and 9 new probes, 65 in all), root `CONTEXT.md`.
+
+Builds affected: both trail, on the `naming` block, the missing `runs/README.md`
+and the missing scaffold print. Each needs `02_scaffold` re-run for the note,
+then `03_emit`. Not re-run in this entry.
+
+---
+
 ## 2026-09-27, video-pipeline re-run for the 2026-09-25 changes, and shipped
 
 Owner's call: ship the video pipeline to a community member. `audit-builds.sh`

@@ -12,14 +12,20 @@ This file does not ship: `03_emit` strips it.
 | `README.md` | what a recipient reads first |
 | `NN_stage/CONTEXT.md` | copy once per stage, rename `NN_stage` to the real name |
 | `_reference/voice.md` | the agent's own voice rules, or delete if intake heard none |
+| `runs/README.md` | the note that makes `runs/` exist before the first run; ships as is |
 
 `AGENTS.md` is not here on purpose. `03_emit` makes it as a byte-for-byte copy
 of the finished `CLAUDE.md`, for hosts that read `AGENTS.md` first.
 
 The built agent writes every run's output into `runs/<unit>/`, numbered by the
-stage that wrote it. Stage folders hold contracts only. Routing rows name that
-folder with its placeholder, `runs/<unit>/`, because it exists only once a run
-has happened.
+stage that wrote it. Stage folders hold contracts only. The build ships `runs/`
+with its note inside, so every route to it resolves before the first run, and a
+rebuild keeps everything under it. Routing rows name a unit's folder with its
+placeholder, `runs/<unit>/`.
+
+No path in this skeleton may be a path that cannot exist in a build. `NN_stage` is
+a folder here so the template resolves; in a build it has a real name, and a
+route left reading `NN_stage` fails the gate.
 
 ## Filling it in
 

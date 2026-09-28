@@ -10,5 +10,5 @@ and that is the point. Files are kebab-case. A `_prefix` means *about the
 workspace, not of the work*, the way `_reference/` holds the rules and never the
 output.
 
-Slugs are lowercase, no spaces, no punctuation. Every output carries the slug of
-the thing it belongs to.
+Slugs are lowercase words joined with hyphens, nothing else. Every output
+carries the slug of the thing it belongs to.

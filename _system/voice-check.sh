@@ -18,11 +18,15 @@
 # standing close) are video-specific and deliberately not carried over.
 
 TARGET="${1:?usage: voice-check.sh <file-or-folder>}"
+TARGET="${TARGET%/}"
 fail=0
 EM=$(printf '\xe2\x80\x94')
 
+# A runs/ folder directly under the target is the product's own record: after
+# use it holds an owner's or a customer's words, which no law here governs. Its
+# note, runs/README.md, is the factory's and is read like any other file.
 if [ -d "$TARGET" ]; then
-  FILES=$(find "$TARGET" -type f 2>/dev/null)
+  FILES=$(find "$TARGET" -type d -path "$TARGET/runs/*" -prune -o -type f -print 2>/dev/null)
 else
   FILES="$TARGET"
 fi

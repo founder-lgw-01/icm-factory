@@ -13,7 +13,7 @@ you are working in. Load what that contract names and nothing more.
 
 | Task | Go to |
 |---|---|
-| Start or continue a run | `CONTEXT.md` → `NN_stage/CONTEXT.md` |
+| Start or continue a run | `CONTEXT.md`, then the `CONTEXT.md` of the stage you are in |
 | {{a rule the agent obeys}} | `_reference/{{file}}.md` |
 | {{how anything reads}} | `_reference/voice.md` |
 | {{start a new unit of work}} | copy `_templates/{{thing}}/` |

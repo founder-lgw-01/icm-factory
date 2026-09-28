@@ -52,6 +52,6 @@ the operator flips it), `generated`, `sources`.
 ## Naming
 
 Folders `NN_kebab-case` where order matters; `_prefix` means *about the workspace,
-not of the work*. Files kebab-case. Build slugs lowercase, no spaces, no
-punctuation. The slug is the folder name in `builds/` and appears in every
-output. `<slug>` in any path is the build being run.
+not of the work*. Files kebab-case. Build slugs lowercase words joined with
+hyphens, nothing else. The slug is the folder name in `builds/` and appears in
+every output. `<slug>` in any path is the build being run.
